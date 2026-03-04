@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Credit Card Program | Thredd</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --thredd-blue: #1A2B8C;
+  --thredd-mid: #2845C8;
+  --thredd-light: #4A6AFF;
+  --thredd-pale: #EEF1FF;
+  --thredd-cream: #F5F4EF;
+  --text-dark: #0D1A4A;
+  --text-mid: #4A5580;
+  --text-light: #8890B0;
+  --white: #FFFFFF;
+  --red-signal: #E8315A;
+  --amber-signal: #F5A623;
+  --green-signal: #22C58B;
+  --blue-partner: #2845C8;
+  --border: #DDE2F0;
+  --cyan-accent: #00C9B7;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: var(--thredd-cream);
+  color: var(--text-dark);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,244,239,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo svg { height: 28px; width: auto; }
+.logo svg .st0 { fill: #0d058f; }
+.logo-white svg .st0, .logo-white svg .stw { fill: #ffffff; }
+
+.nav-cta {
+  font-family: 'Arial', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--thredd-blue);
+  border: 1.5px solid var(--thredd-blue);
+  border-radius: 6px;
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+}
+.nav-cta:hover { background: var(--thredd-blue); color: var(--white); }
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar-wrap {
+  position: fixed;
+  top: 69px;
+  left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+  z-index: 99;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--thredd-mid), var(--thredd-light));
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
+}
+
+/* ===== SCREENS ===== */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; }
+
+/* ===== INTRO SCREEN ===== */
+.intro-screen {
+  flex-direction: column;
+  align-items: center;
+  padding: 120px 48px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-screen::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(72,106,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.intro-screen::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: -150px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(26,43,140,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--thredd-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+.eyebrow::before, .eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: var(--thredd-mid); opacity: 0.4;
+}
+
+.intro-headline {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(34px, 5.5vw, 62px);
+  font-weight: 400;
+  letter-spacing: -1px;
+  color: var(--text-dark);
+  text-align: center;
+  max-width: 840px;
+  line-height: 1.12;
+  margin-bottom: 20px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+.intro-headline em {
+  font-family: 'Arial', sans-serif;
+  font-style: italic;
+  color: var(--thredd-mid);
+}
+
+.intro-subhead {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text-mid);
+  text-align: center;
+  max-width: 600px;
+  line-height: 1.65;
+  margin-bottom: 40px;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+
+/* ===== MARKET STATS SECTION ===== */
+.market-stats-section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 48px;
+  animation: fadeUp 0.6s ease 0.25s both;
+}
+
+.market-stats-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--thredd-mid);
+  text-align: center;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.market-stats-label::before, .market-stats-label::after {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: var(--thredd-mid); opacity: 0.4;
+}
+
+.market-stats-title {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(24px, 3.5vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.market-stats-title em {
+  font-family: 'Arial', sans-serif;
+  font-style: italic;
+  color: var(--thredd-mid);
+}
+
+.market-stats-subtitle {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-mid);
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 24px 24px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26,43,140,0.08);
+}
+
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--thredd-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.stat-icon svg {
+  width: 22px; height: 22px;
+  stroke: var(--thredd-mid);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stat-number {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 400;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.stat-number .unit {
+  font-size: 0.55em;
+  color: var(--text-mid);
+  font-weight: 400;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.stat-desc {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.stat-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green-signal);
+  border: 1.5px solid var(--green-signal);
+  border-radius: 20px;
+  padding: 4px 12px;
+  letter-spacing: 0.3px;
+}
+
+/* ===== INTRO META + CTA ===== */
+.intro-meta {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 36px;
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+.intro-meta-item {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.intro-meta-item svg {
+  width: 14px; height: 14px;
+  stroke: var(--text-light);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.btn-primary {
+  font-family: 'Arial', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--white);
+  background: var(--thredd-blue);
+  border: none;
+  border-radius: 8px;
+  padding: 18px 40px;
+  cursor: pointer;
+  transition: all 0.25s;
+  animation: fadeUp 0.6s ease 0.35s both;
+}
+.btn-primary:hover {
+  background: var(--thredd-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(26,43,140,0.25);
+}
+
+.intro-disclaimer {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-light);
+  margin-top: 20px;
+  text-align: center;
+  max-width: 540px;
+  animation: fadeUp 0.6s ease 0.4s both;
+}
+
+/* ===== COMPONENT SCREEN ===== */
+.question-screen {
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 380px;
+  min-height: 100vh;
+  background: var(--thredd-blue);
+  padding: 120px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(72,106,255,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(26,43,140,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.sidebar-category-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 12px;
+}
+
+.sidebar-category {
+  font-family: 'Arial', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+.sidebar-context {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.sidebar-counter {
+  font-family: 'Arial', sans-serif;
+  font-size: 72px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.12);
+  line-height: 1;
+}
+
+/* Component mini-map in sidebar */
+.sidebar-minimap {
+  display: flex;
+  gap: 6px;
+  margin-top: 24px;
+}
+.minimap-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s;
+}
+.minimap-dot.current { background: var(--white); transform: scale(1.3); }
+.minimap-dot.answered { background: rgba(255,255,255,0.5); }
+
+.question-main {
+  flex: 1;
+  padding: 120px 72px 60px;
+  max-width: 740px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.question-teaching {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  animation: slideIn 0.4s ease both;
+}
+
+.teaching-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--thredd-mid);
+  margin-bottom: 10px;
+}
+
+.teaching-text {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+.question-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+
+.question-text {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--text-dark);
+  line-height: 1.35;
+  margin-bottom: 28px;
+  animation: slideIn 0.4s ease both;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.option-btn {
+  padding: 18px 22px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-family: 'Arial', sans-serif;
+}
+.option-btn:hover { border-color: var(--thredd-mid); }
+.option-btn.selected { border-color: var(--thredd-mid); background: var(--thredd-pale); }
+
+.option-indicator {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  color: var(--text-light);
+  margin-top: 1px;
+}
+.option-btn:hover .option-indicator,
+.option-btn.selected .option-indicator {
+  background: var(--thredd-mid);
+  color: white;
+  border-color: var(--thredd-mid);
+}
+
+.option-content { flex: 1; }
+.option-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+.option-subtext {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-light);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.question-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-back {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-mid);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-back:hover { border-color: var(--text-mid); }
+
+.btn-next {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--thredd-blue);
+  border: none;
+  border-radius: 8px;
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.btn-next:hover:not(:disabled) {
+  background: var(--thredd-mid);
+  transform: translateY(-1px);
+}
+.btn-next:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== GATE SCREEN ===== */
+.gate-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 60px;
+  min-height: 100vh;
+}
+
+.gate-icon {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  background: var(--thredd-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.gate-icon svg {
+  width: 28px; height: 28px;
+  stroke: var(--white);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.gate-title {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 400;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.gate-subhead {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text-mid);
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+
+.gate-form {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gate-form-row {
+  display: flex;
+  gap: 14px;
+}
+
+.gate-input {
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dark);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.gate-input:focus { border-color: var(--thredd-mid); }
+.gate-input::placeholder { color: var(--text-light); }
+
+.gate-submit {
+  font-family: 'Arial', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--thredd-blue);
+  border: none;
+  border-radius: 8px;
+  padding: 16px 32px;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 8px;
+}
+.gate-submit:hover { background: var(--thredd-mid); }
+
+.gate-privacy {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+/* ===== RESULTS SCREEN ===== */
+.results-screen {
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.results-hero {
+  background: var(--thredd-blue);
+  padding: 100px 72px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.results-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(72,106,255,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.results-hero-text { max-width: 640px; }
+
+.results-headline {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 400;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.results-subhead {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.65;
+  max-width: 520px;
+}
+
+/* Completeness gauge */
+.score-gauge-wrap {
+  flex-shrink: 0;
+  text-align: center;
+  position: relative;
+}
+
+.score-gauge {
+  width: 180px; height: 180px;
+  transform: rotate(-90deg);
+}
+.gauge-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 10;
+}
+.gauge-fill {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 502;
+  stroke-dashoffset: 502;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.gauge-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.gauge-score {
+  font-family: 'Arial', sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--white);
+}
+.gauge-of {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+}
+.gauge-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+/* Status summary pills in hero */
+.status-summary {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+}
+.status-pill-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-pill-dot.green { background: var(--green-signal); }
+.status-pill-dot.amber { background: var(--amber-signal); }
+.status-pill-dot.blue { background: var(--thredd-light); }
+.status-pill-dot.red { background: var(--red-signal); }
+
+/* ===== RESULTS BODY ===== */
+.results-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 72px 80px;
+  width: 100%;
+}
+
+/* Section titles */
+.section-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ===== PROGRAM MAP ===== */
+.program-map {
+  margin-bottom: 56px;
+}
+
+.tier-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+
+.tier-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.tier-row.orchestration { grid-template-columns: 1fr; }
+.tier-row.infrastructure { grid-template-columns: repeat(3, 1fr); }
+.tier-row.foundations { grid-template-columns: repeat(3, 1fr); }
+
+.tier-connector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.tier-connector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+}
+
+.tier-connector.triple {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.tier-connector.triple::before { display: none; }
+.tier-connector.triple > span {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.tier-connector.triple > span::before {
+  content: '';
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+}
+
+/* Component blocks in the map */
+.component-block {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.component-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26,43,140,0.08);
+}
+
+.component-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+}
+.component-block.status-covered::before { background: var(--green-signal); }
+.component-block.status-exploring::before { background: var(--amber-signal); }
+.component-block.status-need-partner::before { background: var(--blue-partner); }
+.component-block.status-new::before { background: var(--red-signal); }
+
+.component-status-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.component-status-tag .tag-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-covered .component-status-tag { color: var(--green-signal); }
+.status-covered .tag-dot { background: var(--green-signal); }
+.status-exploring .component-status-tag { color: var(--amber-signal); }
+.status-exploring .tag-dot { background: var(--amber-signal); }
+.status-need-partner .component-status-tag { color: var(--blue-partner); }
+.status-need-partner .tag-dot { background: var(--blue-partner); }
+.status-new .component-status-tag { color: var(--red-signal); }
+.status-new .tag-dot { background: var(--red-signal); }
+
+.component-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.component-role {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+
+.component-partner {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--thredd-mid);
+  line-height: 1.55;
+}
+.component-partner strong {
+  font-weight: 600;
+}
+
+/* ===== RECOMMENDATIONS ===== */
+.reco-section {
+  margin-bottom: 48px;
+}
+
+.reco-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.reco-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  position: relative;
+}
+
+.reco-partner-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--thredd-mid);
+  margin-bottom: 12px;
+}
+
+.reco-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.reco-text {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.65;
+}
+
+.reco-components {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reco-component-tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--thredd-pale);
+  color: var(--thredd-mid);
+}
+
+/* ===== NO GAPS MESSAGE ===== */
+.no-gaps-card {
+  background: var(--white);
+  border: 1.5px solid var(--green-signal);
+  border-radius: 10px;
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.no-gaps-card h3 {
+  font-family: 'Arial', sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.no-gaps-card p {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.65;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* CTA Block */
+.cta-block {
+  background: var(--thredd-blue);
+  border-radius: 16px;
+  padding: 52px 56px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.cta-block::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(72,106,255,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-logo { margin-bottom: 24px; }
+
+.cta-headline {
+  font-family: 'Arial', sans-serif;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.cta-body {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.65;
+  max-width: 540px;
+  margin-bottom: 28px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cta-btn-primary {
+  font-family: 'Arial', sans-serif;
+  background: white;
+  color: var(--thredd-blue);
+  padding: 16px 32px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cta-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+.cta-btn-secondary {
+  font-family: 'Arial', sans-serif;
+  background: transparent;
+  color: white;
+  padding: 16px 32px;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cta-btn-secondary:hover { border-color: rgba(255,255,255,0.6); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  nav { padding: 16px 24px; }
+
+  .intro-screen { padding: 100px 24px 40px; }
+
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+
+  .market-stats-section { padding: 0 0; }
+
+  .intro-meta { gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+  .question-screen { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 90px 24px 24px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  .sidebar-counter { display: none; }
+  .sidebar-context { margin-bottom: 0; }
+  .sidebar-minimap { display: none; }
+
+  .question-main { padding: 32px 24px 60px; }
+
+  .results-hero {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 100px 24px 40px;
+    gap: 24px;
+  }
+  .results-subhead { margin: 0 auto; }
+  .status-summary { justify-content: center; }
+
+  .score-gauge { width: 160px; height: 160px; }
+
+  .results-body { padding: 32px 24px 60px; }
+
+  .tier-row.infrastructure,
+  .tier-row.foundations { grid-template-columns: 1fr; }
+  .tier-connector.triple { grid-template-columns: 1fr; }
+  .tier-connector.triple > span:nth-child(2),
+  .tier-connector.triple > span:nth-child(3) { display: none; }
+
+  .reco-grid { grid-template-columns: 1fr; }
+
+  .cta-block { padding: 32px 24px; }
+  .cta-buttons { flex-direction: column; width: 100%; }
+  .cta-btn-primary, .cta-btn-secondary { width: 100%; text-align: center; }
+
+  .gate-form-row { flex-direction: column; gap: 14px; }
+}
+
+@media (max-width: 560px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 514.4 178.3"><defs><style>.st0{fill:#0d058f}</style></defs><path class="st0" d="M425.9,108.4v-17.2c0-5.4,3.4-8.9,9.2-8.9s10.5,4.9,10.5,12.3v10.2c0,7.6-2.9,12.5-10.5,12.5s-9.2-3.5-9.2-8.9M427.9,135.3c6.9,0,13.4-2.9,17.4-10.9v9.3h24.4V44.6h-24.4v30.2c-3.7-7.6-10.6-10.2-17.7-10.2-15.6,0-26.6,11.4-26.6,31.6v7.6c0,20.1,11.7,31.6,26.9,31.6"/><path class="st0" d="M349.3,108.4v-17.2c0-5.4,3.4-8.9,9.2-8.9s10.5,4.9,10.5,12.3v10.2c0,7.6-2.9,12.5-10.5,12.5s-9.2-3.5-9.2-8.9M351.4,135.3c6.9,0,13.4-2.9,17.4-10.9v9.3h24.4V44.6h-24.4v30.2c-3.7-7.6-10.6-10.2-17.7-10.2-15.6,0-26.6,11.4-26.6,31.6v7.6c0,20.1,11.7,31.6,26.9,31.6"/><path class="st0" d="M275.1,93.5v-2.4c0-5.2,2.2-8.8,8.9-8.8s8.8,3.5,8.8,8.8v2.4h-17.7ZM284,135.3c19,0,29.8-9.6,32.4-23.7h-23.6c-1.2,4.1-4.1,5.9-8.8,5.9-6.7,0-8.9-3.5-8.9-8.8v-2.4h41.8v-7.7c0-24.1-13.9-34.1-32.9-34.1s-33,10.2-33,31.6v7.6c0,21.4,14.4,31.6,33,31.6"/><polygon class="st0" points="200.6 133.7 225 133.7 225 89.2 246 89.2 246 66.9 200.6 66.9 200.6 133.7"/><path class="st0" d="M148.4,133.7v-39.2c0-6.9,3.3-11.7,10-11.7s7.3,3.4,7.3,8.9v42h24.4v-43.1c0-12.5-3.7-26.1-22-26.1s-15.5,3.4-19.7,10.8v-30.7h-24.4v89.2h24.4Z"/><polygon class="st0" points="44.6 89.2 66.9 89.2 66.9 111.4 91.3 111.4 91.3 89.2 113.5 89.2 113.5 66.9 91.3 66.9 91.3 44.6 66.9 44.6 66.9 66.9 44.6 66.9 44.6 89.2"/><rect class="st0" x="91.3" y="111.4" width="22.3" height="22.3"/></svg></div>
+  <button class="nav-cta" onclick="bookCall()">Talk to the team</button>
+</nav>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar"></div>
+</div>
+
+<!-- ===== SCREEN 1: INTRO ===== -->
+<div class="screen intro-screen active" id="screen-intro">
+  <div class="eyebrow">Credit Card Program Builder</div>
+  <h1 class="intro-headline">Build your <em>credit card program</em></h1>
+  <p class="intro-subhead">Every card program needs seven core components working together. Let's map out where you are today — so you can see exactly what's in place, what's in progress, and where the right partner makes the difference.</p>
+
+  <!-- Market Stats Section -->
+  <div class="market-stats-section">
+    <div class="market-stats-label">The Revenue Opportunity</div>
+    <h2 class="market-stats-title">A market defined by <em>scale and momentum</em></h2>
+    <p class="market-stats-subtitle">Credit cards remain deeply embedded in US consumer behavior — and the infrastructure demand behind them is accelerating.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <div class="stat-number">241.50<span class="unit">B</span></div>
+        <div class="stat-label">Card transactions</div>
+        <div class="stat-desc">Forecasted card payment transactions in the US by 2029</div>
+        <div class="stat-badge">+5% CAGR</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="stat-number">$7.57<span class="unit">T</span></div>
+        <div class="stat-label">Credit card value</div>
+        <div class="stat-desc">Projected total credit card transaction value by 2029</div>
+        <div class="stat-badge">Up from $5.86T</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="stat-number">6<span class="unit">%</span></div>
+        <div class="stat-label">Transaction count CAGR</div>
+        <div class="stat-desc">Credit cards are the fastest-growing card segment by transaction volume</div>
+        <div class="stat-badge">2024–2029</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="stat-number">80<span class="unit">%+</span></div>
+        <div class="stat-label">Adult card holders</div>
+        <div class="stat-desc">Over 80% of US adults hold a credit card — cards are embedded in daily life</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stat-number">$1<span class="unit">T+</span></div>
+        <div class="stat-label">Revolving credit</div>
+        <div class="stat-desc">Total US revolving credit exceeds $1 trillion — cards function as large-scale unsecured lending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="stat-number">~40<span class="unit">%</span></div>
+        <div class="stat-label">POS dominance</div>
+        <div class="stat-desc">Credit cards remain the dominant point-of-sale payment method in the US</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro-meta">
+    <span class="intro-meta-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      5 minutes
+    </span>
+    <span class="intro-meta-item">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      7 components
+    </span>
+    <span class="intro-meta-item">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Program blueprint
+    </span>
+  </div>
+
+  <button class="btn-primary" onclick="startBuilder()">Map your program</button>
+  <p class="intro-disclaimer">A collaborative tool to map your card program ecosystem. You'll get a visual program blueprint showing what's in place and how we complete it — something you can share with your team or bring to a first call.</p>
+</div>
+
+<!-- ===== COMPONENT SCREEN ===== -->
+<div class="screen question-screen" id="screen-component">
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-category-label" id="sidebarLabel">COMPONENT 1 OF 7</div>
+      <div class="sidebar-category" id="sidebarCategory"></div>
+      <p class="sidebar-context" id="sidebarContext"></p>
+      <div class="sidebar-minimap" id="sidebarMinimap"></div>
+    </div>
+    <div class="sidebar-counter" id="sidebarCounter"></div>
+  </div>
+  <div class="question-main">
+    <div class="question-teaching" id="teachingBlock">
+      <div class="teaching-label">What this component does</div>
+      <p class="teaching-text" id="teachingText"></p>
+    </div>
+    <div class="question-number" id="questionNumber"></div>
+    <h2 class="question-text" id="questionText"></h2>
+    <div class="options-list" id="optionsList"></div>
+    <div class="question-nav">
+      <button class="btn-back" id="btnBack" onclick="goBack()">Back</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()" disabled>Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GATE SCREEN ===== -->
+<div class="screen gate-screen" id="screen-gate">
+  <div class="gate-icon">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <h2 class="gate-title">Your program blueprint is ready</h2>
+  <p class="gate-subhead">We've mapped your answers across the seven components of a credit card program. Enter your details to see your visual program blueprint and how we complete it together.</p>
+  <div class="gate-form">
+    <div class="gate-form-row">
+      <input class="gate-input" type="text" id="gateFirst" placeholder="First name" aria-label="First name">
+      <input class="gate-input" type="text" id="gateLast" placeholder="Last name" aria-label="Last name">
+    </div>
+    <input class="gate-input" type="email" id="gateEmail" placeholder="Work email" aria-label="Work email">
+    <input class="gate-input" type="text" id="gateCompany" placeholder="Company" aria-label="Company">
+    <button class="gate-submit" type="button" onclick="submitGate()">See my program blueprint</button>
+  </div>
+  <p class="gate-privacy">Thredd will use your details to follow up on your program plan. We don't share your data. We won't spam you.</p>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div class="screen results-screen" id="screen-results">
+  <div class="results-hero">
+    <div class="results-hero-text">
+      <h2 class="results-headline" id="resultsHeadline"></h2>
+      <p class="results-subhead" id="resultsSubhead"></p>
+      <div class="status-summary" id="statusSummary"></div>
+    </div>
+    <div class="score-gauge-wrap">
+      <svg viewBox="0 0 200 200" class="score-gauge">
+        <circle class="gauge-bg" cx="100" cy="100" r="80"/>
+        <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="80" style="stroke: var(--green-signal);"/>
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-score" id="gaugeScore">0<span class="gauge-of">/7</span></div>
+        <div class="gauge-label">In Place</div>
+      </div>
+    </div>
+  </div>
+  <div class="results-body">
+
+    <h3 class="section-title">Your program blueprint</h3>
+    <p class="section-subtitle">Each component of your card program, mapped by readiness. This is the architecture you'll need — and here's where each piece stands today.</p>
+
+    <!-- Program Map -->
+    <div class="program-map" id="programMap">
+      <!-- Tier 1: Orchestration -->
+      <div class="tier-label">Orchestration Layer</div>
+      <div class="tier-row orchestration" id="tierOrchestration"></div>
+
+      <div class="tier-connector">
+        <span></span>
+      </div>
+
+      <!-- Tier 2: Infrastructure -->
+      <div class="tier-label">Core Infrastructure</div>
+      <div class="tier-row infrastructure" id="tierInfrastructure"></div>
+
+      <div class="tier-connector triple">
+        <span></span><span></span><span></span>
+      </div>
+
+      <!-- Tier 3: Foundations -->
+      <div class="tier-label">Operational Foundations</div>
+      <div class="tier-row foundations" id="tierFoundations"></div>
+    </div>
+
+    <!-- Recommendations -->
+    <div id="recoSection"></div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <div class="logo cta-logo logo-white"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 514.4 178.3"><defs><style>.stw{fill:#ffffff}</style></defs><path class="stw" d="M425.9,108.4v-17.2c0-5.4,3.4-8.9,9.2-8.9s10.5,4.9,10.5,12.3v10.2c0,7.6-2.9,12.5-10.5,12.5s-9.2-3.5-9.2-8.9M427.9,135.3c6.9,0,13.4-2.9,17.4-10.9v9.3h24.4V44.6h-24.4v30.2c-3.7-7.6-10.6-10.2-17.7-10.2-15.6,0-26.6,11.4-26.6,31.6v7.6c0,20.1,11.7,31.6,26.9,31.6"/><path class="stw" d="M349.3,108.4v-17.2c0-5.4,3.4-8.9,9.2-8.9s10.5,4.9,10.5,12.3v10.2c0,7.6-2.9,12.5-10.5,12.5s-9.2-3.5-9.2-8.9M351.4,135.3c6.9,0,13.4-2.9,17.4-10.9v9.3h24.4V44.6h-24.4v30.2c-3.7-7.6-10.6-10.2-17.7-10.2-15.6,0-26.6,11.4-26.6,31.6v7.6c0,20.1,11.7,31.6,26.9,31.6"/><path class="stw" d="M275.1,93.5v-2.4c0-5.2,2.2-8.8,8.9-8.8s8.8,3.5,8.8,8.8v2.4h-17.7ZM284,135.3c19,0,29.8-9.6,32.4-23.7h-23.6c-1.2,4.1-4.1,5.9-8.8,5.9-6.7,0-8.9-3.5-8.9-8.8v-2.4h41.8v-7.7c0-24.1-13.9-34.1-32.9-34.1s-33,10.2-33,31.6v7.6c0,21.4,14.4,31.6,33,31.6"/><polygon class="stw" points="200.6 133.7 225 133.7 225 89.2 246 89.2 246 66.9 200.6 66.9 200.6 133.7"/><path class="stw" d="M148.4,133.7v-39.2c0-6.9,3.3-11.7,10-11.7s7.3,3.4,7.3,8.9v42h24.4v-43.1c0-12.5-3.7-26.1-22-26.1s-15.5,3.4-19.7,10.8v-30.7h-24.4v89.2h24.4Z"/><polygon class="stw" points="44.6 89.2 66.9 89.2 66.9 111.4 91.3 111.4 91.3 89.2 113.5 89.2 113.5 66.9 91.3 66.9 91.3 44.6 66.9 44.6 66.9 66.9 44.6 66.9 44.6 89.2"/><rect class="stw" x="91.3" y="111.4" width="22.3" height="22.3"/></svg></div>
+      <h3 class="cta-headline" id="ctaHeadline"></h3>
+      <p class="cta-body" id="ctaBody"></p>
+      <div class="cta-buttons">
+        <button class="cta-btn-primary" onclick="downloadBlueprint()">Download your program blueprint</button>
+        <button class="cta-btn-secondary" onclick="bookCall()">Talk to the team</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== COMPONENT DATA =====
+// The seven buckets of a credit card program ecosystem
+// Status options: 0 = covered, 1 = exploring, 2 = need partner, 3 = didn't know needed
+const components = [
+  {
+    id: 'program-manager',
+    name: 'Program Manager',
+    tier: 'orchestration',
+    sidebarContext: 'The program manager coordinates every moving part — your product, your vendors, your cardholder experience. They are the general contractor of your card program.',
+    teaching: 'The program manager is the strategic coordinator of your card program. They define your product — interest rates, fee structures, rewards — and manage the relationships between all other components: your BIN sponsor, processor, ledger, and compliance systems. Think of them as the general contractor: they don\'t build every part, but they make sure every part works together. Many fintechs and lenders partner with an experienced program manager to accelerate their time to market.',
+    question: 'Let\'s start with program management. Who\'s going to coordinate the moving parts of your card program?',
+    options: [
+      { text: 'We have this covered', sub: 'We have program management expertise in-house or a partner contracted' },
+      { text: 'We\'re exploring options', sub: 'We\'re evaluating whether to build this capability or partner for it' },
+      { text: 'We need a partner for this', sub: 'We know we need program management support — we\'re looking for the right fit' },
+      { text: 'We didn\'t know this was needed', sub: 'This is a new concept for us — tell us more' }
+    ],
+    role: 'Coordinates product definition, vendor relationships, and cardholder experience across the entire program',
+    partnerType: 'partner',
+    partnerFill: 'Thredd works with established program managers and can make introductions based on your program profile and target market.'
+  },
+  {
+    id: 'bin-sponsor',
+    name: 'BIN Sponsor',
+    tier: 'infrastructure',
+    sidebarContext: 'To issue Visa or Mastercard credit cards in the US, you need a BIN sponsor — a bank that holds the Bank Identification Number and maintains the network relationship.',
+    teaching: 'To issue Visa or Mastercard credit cards in the US, you need a BIN sponsor — a financial institution that holds the Bank Identification Number (BIN) and maintains the direct relationship with the card network. The BIN sponsor settles with the network on your behalf and takes on certain regulatory obligations. This isn\'t optional — it\'s a structural requirement. Your BIN sponsor relationship determines your interchange qualification, your scheme compliance obligations, and your settlement mechanics. Most lenders entering the card space don\'t have this relationship in place yet.',
+    question: 'Every US card program needs a BIN sponsor. Where are you with this relationship?',
+    options: [
+      { text: 'We have this covered', sub: 'BIN sponsor identified, in discussions, or contracted' },
+      { text: 'We\'re exploring options', sub: 'We understand the requirement and are evaluating potential sponsors' },
+      { text: 'We need a partner for this', sub: 'We need introductions to suitable BIN sponsors' },
+      { text: 'We didn\'t know this was needed', sub: 'This is new to us — we assumed our banking partner covered this' }
+    ],
+    role: 'Provides network access, settles with Visa/Mastercard, holds regulatory obligations for the program',
+    partnerType: 'thredd',
+    partnerFill: '<strong>Thredd</strong> has relationships with established BIN sponsors across the US and can help structure the right sponsorship arrangement for your program — matching BIN type, interchange qualification, and settlement terms to your economics.'
+  },
+  {
+    id: 'processor',
+    name: 'Processor',
+    tier: 'infrastructure',
+    sidebarContext: 'The processor is the real-time engine. Every tap, swipe, and online purchase flows through it — authorization decisions happen in milliseconds.',
+    teaching: 'The processor is the real-time engine of your card program. When a cardholder taps their card, the processor receives the authorization request from the network, applies your rules — spending limits, merchant controls, available balance, fraud checks — and returns a decision, all within milliseconds. Every transaction your cardholders make flows through the processor. This is fundamentally different from lending, where credit decisions happen once at origination. In card issuing, you\'re making hundreds of credit decisions per customer per month, in real time.',
+    question: 'Processing is the real-time engine of card issuing. How are you planning to handle transaction processing?',
+    options: [
+      { text: 'We have this covered', sub: 'We have a card processor selected or contracted' },
+      { text: 'We\'re exploring options', sub: 'We\'re evaluating processing platforms and comparing capabilities' },
+      { text: 'We need a partner for this', sub: 'We need a processing partner — this isn\'t something we\'ll build in-house' },
+      { text: 'We didn\'t know this was needed', sub: 'We hadn\'t considered card processing as a separate requirement' }
+    ],
+    role: 'Handles real-time authorization, transaction routing, network messaging, and settlement processing',
+    partnerType: 'thredd',
+    partnerFill: '<strong>This is Thredd\'s core capability.</strong> Card processing, real-time authorization, network connectivity, and settlement — all through a modern API-first platform built for credit card programs.'
+  },
+  {
+    id: 'credit-ledger',
+    name: 'Credit Ledger',
+    tier: 'infrastructure',
+    sidebarContext: 'A credit card ledger is fundamentally different from a loan ledger. It manages revolving balances, billing cycles, interest accrual, and statement generation — simultaneously, for every account.',
+    teaching: 'The credit ledger manages the financial lifecycle of every cardholder account: revolving balances, billing cycles, interest calculations across different balance types (purchases, cash advances, balance transfers), minimum payment logic, and monthly statement generation. This is fundamentally different from a loan ledger, which tracks a single disbursement and repayment schedule. A credit card ledger manages continuous, variable borrowing across thousands of accounts simultaneously — and it needs to produce compliant statements every month.',
+    question: 'The credit ledger is the financial backbone. What\'s your plan for managing revolving credit accounts?',
+    options: [
+      { text: 'We have this covered', sub: 'We have a credit card ledger solution identified or in place' },
+      { text: 'We\'re exploring options', sub: 'We\'re evaluating credit ledger platforms and their capabilities' },
+      { text: 'We need a partner for this', sub: 'We know our loan ledger won\'t work — we need a credit-specific solution' },
+      { text: 'We didn\'t know this was needed', sub: 'We assumed our existing loan management system could handle this' }
+    ],
+    role: 'Manages revolving balances, billing cycles, interest calculations, minimum payments, and statement generation',
+    partnerType: 'loanpro',
+    partnerFill: '<strong>LoanPro</strong> provides the credit card ledger — handling revolving balances, billing cycles, multi-type interest calculations, minimum payment logic, and compliant statement generation. Pre-integrated with <strong>Thredd\'s</strong> processing platform.'
+  },
+  {
+    id: 'capital',
+    name: 'Capital',
+    tier: 'foundations',
+    sidebarContext: 'Someone needs to fund the credit lines your cardholders draw against. Your capital strategy determines the economics of the entire program.',
+    teaching: 'When a cardholder swipes their card, real money moves. Someone needs to provide the capital that backs your credit lines. Your capital strategy — whether through your own balance sheet, a warehouse facility, or a dedicated capital partner — determines the economics of your entire program. The cost of capital feeds directly into your pricing, your credit line sizing, and your program profitability. This is an area where getting the structure right from the start has an outsized impact on long-term program economics.',
+    question: 'Capital funds every transaction. How are you thinking about funding your credit lines?',
+    options: [
+      { text: 'We have this covered', sub: 'Our capital strategy is defined — balance sheet, facility, or capital partner in place' },
+      { text: 'We\'re exploring options', sub: 'We\'re evaluating funding structures and talking to potential capital partners' },
+      { text: 'We need a partner for this', sub: 'We need to find the right capital structure for a card program' },
+      { text: 'We didn\'t know this was needed', sub: 'We hadn\'t considered capital requirements as separate from our lending operations' }
+    ],
+    role: 'Provides the funding that backs cardholder credit lines — balance sheet, warehouse facility, or capital partner',
+    partnerType: 'both',
+    partnerFill: '<strong>Thredd</strong> and <strong>LoanPro</strong> can connect you with capital partners and warehouse facilities that fund credit card programs, helping you match your capital structure to your program economics.'
+  },
+  {
+    id: 'risk-ownership',
+    name: 'Risk Ownership',
+    tier: 'foundations',
+    sidebarContext: 'In cards, your credit exposure changes with every transaction. The cardholder decides when and how much to borrow — risk management needs to operate continuously.',
+    teaching: 'In lending, you make one credit decision at origination and control the disbursement. In card issuing, the cardholder decides when to borrow, how much, and where — hundreds of times per month. Your credit exposure is dynamic, not fixed. Risk ownership covers underwriting, credit line management, utilization monitoring, overlimit controls, loss forecasting, and collections. Someone needs to own this dynamic risk continuously. The risk profile of a revolving credit portfolio behaves fundamentally differently from a term loan book — it requires active, ongoing management rather than periodic review.',
+    question: 'Risk ownership is continuous in cards. Who\'s going to own credit risk across the portfolio?',
+    options: [
+      { text: 'We have this covered', sub: 'We have a risk management strategy defined for revolving credit' },
+      { text: 'We\'re exploring options', sub: 'We understand the difference from term lending and are developing our approach' },
+      { text: 'We need a partner for this', sub: 'We need tools and support for dynamic credit risk management' },
+      { text: 'We didn\'t know this was needed', sub: 'We planned to apply our existing lending risk models to the card portfolio' }
+    ],
+    role: 'Owns underwriting, credit line management, utilization monitoring, loss forecasting, and collections',
+    partnerType: 'both',
+    partnerFill: '<strong>Thredd</strong> enforces credit controls at authorization — spending limits, merchant restrictions, and overlimit rules in real time. <strong>LoanPro</strong> provides portfolio-level risk management, utilization monitoring, and collections tools.'
+  },
+  {
+    id: 'compliance',
+    name: 'Compliance',
+    tier: 'foundations',
+    sidebarContext: 'Credit cards carry regulatory requirements beyond lending — CARD Act, SCRA, TILA, and state lending laws form a distinct compliance workload.',
+    teaching: 'Credit cards carry regulatory requirements on top of standard lending compliance. The CARD Act governs how interest rates can change, how payments are applied, and what disclosures must appear on statements. SCRA requires specific interest rate adjustments for deployed military cardholders — backdated to deployment date. TILA mandates specific statement content and disclosure formats. State lending laws add further variation. This is a distinct compliance workload that needs automated enforcement to scale. Manual compliance doesn\'t work with card portfolios — the volume and regulatory complexity require purpose-built systems.',
+    question: 'Compliance is a distinct workload in cards. How are you covering card-specific regulatory requirements?',
+    options: [
+      { text: 'We have this covered', sub: 'We\'ve mapped CARD Act, SCRA, TILA requirements and have a compliance plan' },
+      { text: 'We\'re exploring options', sub: 'We know these regulations exist and are building our compliance approach' },
+      { text: 'We need a partner for this', sub: 'We need a platform that handles card-specific compliance requirements' },
+      { text: 'We didn\'t know this was needed', sub: 'We assumed our existing compliance framework would cover credit cards' }
+    ],
+    role: 'Handles CARD Act, SCRA, TILA, CFPB guidelines, state lending laws, and scheme compliance rules',
+    partnerType: 'loanpro',
+    partnerFill: '<strong>LoanPro</strong> has built CARD Act, SCRA, TILA, and CFPB compliance directly into the platform — automated disclosures, payment application rules, audit trails, and compliant statement generation.'
+  }
+];
+
+// Status labels and CSS classes
+const STATUS = {
+  0: { label: 'Covered', cssClass: 'status-covered', dotClass: 'green' },
+  1: { label: 'Exploring', cssClass: 'status-exploring', dotClass: 'amber' },
+  2: { label: 'Needs Partner', cssClass: 'status-need-partner', dotClass: 'blue' },
+  3: { label: 'New Discovery', cssClass: 'status-new', dotClass: 'red' }
+};
+
+// ===== STATE =====
+let currentComponent = 0;
+let answers = new Array(components.length).fill(-1);
+let userName = '';
+
+// ===== NAVIGATION =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function updateProgress() {
+  const total = components.length + 2;
+  let current = 0;
+  if (document.getElementById('screen-component').classList.contains('active')) {
+    current = currentComponent + 1;
+  } else if (document.getElementById('screen-gate').classList.contains('active')) {
+    current = components.length + 1;
+  } else if (document.getElementById('screen-results').classList.contains('active')) {
+    current = total;
+  }
+  document.getElementById('progressBar').style.width = (current / total) * 100 + '%';
+}
+
+function startBuilder() {
+  currentComponent = 0;
+  renderComponent();
+  showScreen('screen-component');
+  updateProgress();
+}
+
+function renderComponent() {
+  const c = components[currentComponent];
+  document.getElementById('sidebarLabel').textContent = 'Component ' + (currentComponent + 1) + ' of ' + components.length;
+  document.getElementById('sidebarCategory').textContent = c.name;
+  document.getElementById('sidebarContext').textContent = c.sidebarContext;
+  document.getElementById('sidebarCounter').textContent = String(currentComponent + 1).padStart(2, '0');
+
+  // Minimap
+  const minimap = document.getElementById('sidebarMinimap');
+  minimap.innerHTML = '';
+  components.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'minimap-dot';
+    if (i === currentComponent) dot.classList.add('current');
+    else if (answers[i] !== -1) dot.classList.add('answered');
+    minimap.appendChild(dot);
+  });
+
+  document.getElementById('teachingText').textContent = c.teaching;
+  document.getElementById('questionNumber').textContent = 'Component ' + (currentComponent + 1) + ' of ' + components.length;
+  document.getElementById('questionText').textContent = c.question;
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  c.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[currentComponent] === i ? ' selected' : '');
+    btn.type = 'button';
+    btn.innerHTML = `
+      <div class="option-indicator">${letters[i]}</div>
+      <div class="option-content">
+        <div class="option-label">${opt.text}</div>
+        <div class="option-subtext">${opt.sub}</div>
+      </div>
+    `;
+    btn.onclick = () => selectOption(i);
+    list.appendChild(btn);
+  });
+
+  document.getElementById('btnBack').style.visibility = currentComponent === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').disabled = answers[currentComponent] === -1;
+  document.getElementById('btnNext').textContent = currentComponent === components.length - 1 ? 'See my blueprint' : 'Next component';
+  updateProgress();
+}
+
+function selectOption(index) {
+  answers[currentComponent] = index;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+  document.getElementById('btnNext').disabled = false;
+}
+
+function goBack() {
+  if (currentComponent > 0) {
+    currentComponent--;
+    renderComponent();
+  }
+}
+
+function goNext() {
+  if (currentComponent < components.length - 1) {
+    currentComponent++;
+    renderComponent();
+  } else {
+    showScreen('screen-gate');
+    updateProgress();
+  }
+}
+
+// ===== GATE =====
+function submitGate() {
+  userName = document.getElementById('gateFirst').value.trim() || 'there';
+
+  const firstName = document.getElementById('gateFirst').value;
+  const lastName = document.getElementById('gateLast').value;
+  const email = document.getElementById('gateEmail').value;
+  const company = document.getElementById('gateCompany').value;
+
+  // In production: POST to HubSpot/Salesforce
+  console.log('Lead captured:', { firstName, lastName, email, company, answers, timestamp: new Date().toISOString() });
+
+  renderResults();
+  showScreen('screen-results');
+  updateProgress();
+
+  // Animate gauge
+  setTimeout(() => {
+    const coveredCount = answers.filter(a => a === 0).length;
+    const offset = 502 - (502 * coveredCount / components.length);
+    document.getElementById('gaugeFill').style.strokeDashoffset = offset;
+  }, 100);
+}
+
+// ===== RESULTS =====
+function renderResults() {
+  const coveredCount = answers.filter(a => a === 0).length;
+  const exploringCount = answers.filter(a => a === 1).length;
+  const needPartnerCount = answers.filter(a => a === 2).length;
+  const newCount = answers.filter(a => a === 3).length;
+  const gapCount = needPartnerCount + newCount;
+
+  // Gauge
+  document.getElementById('gaugeScore').innerHTML = coveredCount + '<span class="gauge-of">/7</span>';
+
+  // Gauge color
+  const gaugeFill = document.getElementById('gaugeFill');
+  if (coveredCount >= 5) gaugeFill.style.stroke = 'var(--green-signal)';
+  else if (coveredCount >= 3) gaugeFill.style.stroke = 'var(--amber-signal)';
+  else gaugeFill.style.stroke = 'var(--red-signal)';
+
+  // Hero headline
+  let headline, subhead;
+  if (coveredCount >= 5) {
+    headline = `${userName}, your program is well-structured — let's close the remaining gaps.`;
+    subhead = 'Most of your program components are in place or actively being built. The components that remain are the kind where the right partner accelerates your timeline rather than adding complexity.';
+  } else if (coveredCount >= 3) {
+    headline = `${userName}, you've built a solid foundation — now let's complete the program.`;
+    subhead = 'Several key components are in place, but there are meaningful gaps in the ecosystem that need to be addressed before launch. The good news: these are exactly the areas where Thredd and LoanPro operate.';
+  } else if (gapCount <= 3) {
+    headline = `${userName}, your program is taking shape — let's map the path forward.`;
+    subhead = 'You\'re actively exploring most components of the card program ecosystem. That exploratory work puts you in a strong position to make informed partner decisions.';
+  } else {
+    headline = `${userName}, here's the full picture of what your program needs.`;
+    subhead = 'A credit card program is a coordinated ecosystem of seven components. Knowing what you need — and what you didn\'t know you needed — is the first step to building it right. Here\'s your program, and here\'s how we complete it.';
+  }
+
+  document.getElementById('resultsHeadline').textContent = headline;
+  document.getElementById('resultsSubhead').textContent = subhead;
+
+  // Status summary pills
+  const summaryDiv = document.getElementById('statusSummary');
+  summaryDiv.innerHTML = '';
+  if (coveredCount > 0) summaryDiv.innerHTML += `<div class="status-pill"><span class="status-pill-dot green"></span>${coveredCount} covered</div>`;
+  if (exploringCount > 0) summaryDiv.innerHTML += `<div class="status-pill"><span class="status-pill-dot amber"></span>${exploringCount} exploring</div>`;
+  if (needPartnerCount > 0) summaryDiv.innerHTML += `<div class="status-pill"><span class="status-pill-dot blue"></span>${needPartnerCount} need a partner</div>`;
+  if (newCount > 0) summaryDiv.innerHTML += `<div class="status-pill"><span class="status-pill-dot red"></span>${newCount} new discovery</div>`;
+
+  // Program map
+  const tiers = {
+    orchestration: document.getElementById('tierOrchestration'),
+    infrastructure: document.getElementById('tierInfrastructure'),
+    foundations: document.getElementById('tierFoundations')
+  };
+  Object.values(tiers).forEach(t => t.innerHTML = '');
+
+  components.forEach((comp, i) => {
+    const status = STATUS[answers[i]];
+    const needsPartner = answers[i] >= 2;
+
+    const block = document.createElement('div');
+    block.className = 'component-block ' + status.cssClass;
+    block.innerHTML = `
+      <div class="component-status-tag"><span class="tag-dot"></span>${status.label}</div>
+      <div class="component-name">${comp.name}</div>
+      <div class="component-role">${comp.role}</div>
+      ${needsPartner ? '<div class="component-partner">' + comp.partnerFill + '</div>' : ''}
+    `;
+    tiers[comp.tier].appendChild(block);
+  });
+
+  // Recommendations section
+  const recoDiv = document.getElementById('recoSection');
+  recoDiv.innerHTML = '';
+
+  // Gather components that need help (score 2 or 3)
+  const gapComponents = components.filter((_, i) => answers[i] >= 2);
+
+  if (gapComponents.length > 0) {
+    const sectionHTML = `
+      <h3 class="section-title">How we complete your program</h3>
+      <p class="section-subtitle">The components you've flagged as needing support map directly to capabilities that Thredd, LoanPro, and our program management network provide.</p>
+    `;
+    recoDiv.innerHTML = sectionHTML;
+
+    const recoGrid = document.createElement('div');
+    recoGrid.className = 'reco-grid';
+
+    // Group by partner type
+    const threddComponents = gapComponents.filter(c => c.partnerType === 'thredd');
+    const loanproComponents = gapComponents.filter(c => c.partnerType === 'loanpro');
+    const bothComponents = gapComponents.filter(c => c.partnerType === 'both');
+    const partnerComponents = gapComponents.filter(c => c.partnerType === 'partner');
+
+    if (threddComponents.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'reco-card';
+      card.innerHTML = `
+        <div class="reco-partner-badge">Thredd</div>
+        <h4 class="reco-title">Card processing and network access</h4>
+        <p class="reco-text">Thredd provides the issuing and processing infrastructure that sits at the center of your program — real-time authorization, network connectivity, settlement, and BIN sponsor relationships.</p>
+        <div class="reco-components">${threddComponents.map(c => '<span class="reco-component-tag">' + c.name + '</span>').join('')}</div>
+      `;
+      recoGrid.appendChild(card);
+    }
+
+    if (loanproComponents.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'reco-card';
+      card.innerHTML = `
+        <div class="reco-partner-badge">LoanPro</div>
+        <h4 class="reco-title">Credit servicing and compliance</h4>
+        <p class="reco-text">LoanPro provides the credit card ledger and compliance automation — revolving balance management, billing cycles, CARD Act and SCRA compliance, and compliant statement generation. Pre-integrated with Thredd's processing stack.</p>
+        <div class="reco-components">${loanproComponents.map(c => '<span class="reco-component-tag">' + c.name + '</span>').join('')}</div>
+      `;
+      recoGrid.appendChild(card);
+    }
+
+    if (bothComponents.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'reco-card';
+      card.innerHTML = `
+        <div class="reco-partner-badge">Thredd + LoanPro</div>
+        <h4 class="reco-title">Integrated program support</h4>
+        <p class="reco-text">Some components span both processing and servicing. Thredd and LoanPro work together to provide integrated solutions — from real-time risk controls at authorization to portfolio-level management and capital partner introductions.</p>
+        <div class="reco-components">${bothComponents.map(c => '<span class="reco-component-tag">' + c.name + '</span>').join('')}</div>
+      `;
+      recoGrid.appendChild(card);
+    }
+
+    if (partnerComponents.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'reco-card';
+      card.innerHTML = `
+        <div class="reco-partner-badge">Program Management Network</div>
+        <h4 class="reco-title">Strategic program coordination</h4>
+        <p class="reco-text">Thredd works with established program managers who can coordinate the strategic layer of your card program — product definition, vendor management, and go-to-market coordination. We'll make introductions based on your program profile.</p>
+        <div class="reco-components">${partnerComponents.map(c => '<span class="reco-component-tag">' + c.name + '</span>').join('')}</div>
+      `;
+      recoGrid.appendChild(card);
+    }
+
+    recoDiv.appendChild(recoGrid);
+
+    // Add spacing before CTA
+    const spacer = document.createElement('div');
+    spacer.style.height = '48px';
+    recoDiv.appendChild(spacer);
+  } else {
+    // All covered — show a positive message
+    recoDiv.innerHTML = `
+      <div class="no-gaps-card">
+        <h3>Your program ecosystem is well-covered</h3>
+        <p>You have all seven components of the card program in place or under active evaluation. A conversation with Thredd can help validate your architecture, identify integration efficiencies, and accelerate your timeline to launch.</p>
+      </div>
+    `;
+  }
+
+  // CTA content
+  if (gapCount >= 4) {
+    document.getElementById('ctaHeadline').textContent = 'Here\'s your program — and here\'s how we complete it together.';
+    document.getElementById('ctaBody').textContent = 'Thredd and LoanPro provide a pre-integrated credit card issuing and servicing stack that covers processing, ledgering, compliance, and network access. A 30-minute conversation can map your program blueprint to an implementation timeline.';
+  } else if (gapCount >= 1) {
+    document.getElementById('ctaHeadline').textContent = 'Let\'s close the gaps and get your program to launch.';
+    document.getElementById('ctaBody').textContent = 'You have a strong foundation. The components that need support are exactly the areas where Thredd and LoanPro provide purpose-built infrastructure. Let\'s talk about what filling these gaps looks like — timeline, cost, and integration.';
+  } else {
+    document.getElementById('ctaHeadline').textContent = 'Your program is well-structured. Let\'s talk about making it operational.';
+    document.getElementById('ctaBody').textContent = 'Thredd has helped lenders and fintechs bring card programs from blueprint to launch. Even with all components covered, there are integration, testing, and go-live decisions where implementation experience makes a difference.';
+  }
+}
+
+// ===== PRODUCTION HOOKS =====
+function downloadBlueprint() {
+  const coveredCount = answers.filter(a => a === 0).length;
+  alert('In production, this triggers a PDF download of the program blueprint.\n\nCRM data captured:\n- Components in place: ' + coveredCount + '/7\n- Individual statuses: [' + answers.map((a, i) => components[i].name + ': ' + STATUS[a].label).join(', ') + ']');
+}
+
+function bookCall() {
+  alert('In production, this opens a Calendly embed or redirects to the Thredd scheduling page.');
+}
+</script>
+
+</body>
+</html>
